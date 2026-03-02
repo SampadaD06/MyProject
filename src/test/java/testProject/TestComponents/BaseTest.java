@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -31,22 +35,29 @@ public WebDriver initializeDriver() throws IOException {
 	Properties prop = new Properties();
 	FileInputStream file = new FileInputStream(System.getProperty("user.dir")+"//src//main//java//testProject//resources//GlobalData.properties");
 	prop.load(file);
-	String BrowserName = prop.getProperty("browser");
-	
-	if(BrowserName.equalsIgnoreCase("chrome")) 
-	{
-	WebDriverManager.chromedriver().setup();
-	 driver = new ChromeDriver();
-	
-}
+	String browserName = System.getProperty("browser")!=null ? System.getProperty("browser") :prop.getProperty("browser");
+	//prop.getProperty("browser");
 
-    else if (BrowserName.equalsIgnoreCase("firefox"))
-    {
+	if (browserName.contains("chrome")) {
+		ChromeOptions options = new ChromeOptions();
+		WebDriverManager.chromedriver().setup();
+		if(browserName.contains("headless")){
+		options.addArguments("headless");
+		}		
+		driver = new ChromeDriver(options);
+		driver.manage().window().setSize(new Dimension(1440,900));//full screen
+
+	} else if (browserName.equalsIgnoreCase("firefox")) {
+		System.setProperty("webdriver.gecko.driver",
+				"C:\\Users\\ASUS\\Downloads\\geckodriver.exe");
+		driver = new FirefoxDriver();
+		// Firefox
+	} else if (browserName.equalsIgnoreCase("edge")) {
+		// Edge
+		System.setProperty("webdriver.edge.driver", "edge.exe");
+		driver = new EdgeDriver();
 	
-}
-    else if (BrowserName.equalsIgnoreCase("edge"))
-    {
-	
+
 }
 	driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 	driver.manage().window().maximize();
